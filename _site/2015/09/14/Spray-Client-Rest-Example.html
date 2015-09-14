@@ -1,0 +1,52 @@
+<h1 id="ltgithub-pagespray-client-rest">&lt;Github Page&gt;Spray-client Rest</h1>
+<p>First:  sbt import</p>
+<pre>"io.spray" %% "spray-client" % "1.3.1",
+"io.spray" %% "spray-can" % "1.3.2",
+"io.spray" %% "spray-routing" % "1.3.2"</pre>
+<hr />
+
+<p>Second : code Example
+<em>Get request</em></p>
+
+<pre>import spray.client.pipelining._
+import spray.http._
+import scala.concurrent._
+import akka.actor.{ActorSystem, Props}
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util._
+implicit val system = ActorSystem()
+val pipeline: HttpRequest =&gt; Future[HttpResponse] = sendReceive
+val response: Future[HttpResponse] = pipeline(Get("http://tiku.huatu.com/apis/cascalog/logs/mod_user_log"))
+response.onComplete {
+  case Failure(t) =&gt;
+    println(s"error ")
+  case Success(r) =&gt;
+    	pintln(s"success ${r.status}")
+    println(r.entity.asString)
+}</pre>
+
+<p><em>Post request</em></p>
+
+<pre>case class User(id: Option[Int], username: String)
+
+implicit val orderConfirmationFormat = jsonFormat2(User)   // extends DefaultJsonProtocol
+mport spray.client.pipelining._
+import spray.http._
+import scala.concurrent._
+import akka.actor.{ActorSystem}
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util._
+implicit val system = ActorSystem()
+import spray.httpx.SprayJsonSupport._  //重要
+val pipeline: HttpRequest =&gt; Future[User] =   sendReceive ~&gt; unmarshal[User]
+val response: Future[User] = pipeline { Post("http://localhost:8088/users", User(Option(100),"jiang"))}
+  response.onComplete{
+    case Failure(t) =&gt;
+      println(s"error $t")
+    case Success(r) =&gt;
+      println(s"success ${r}")
+      println(r)
+  }</pre>
+
+<p><strong>完整代码请参考</strong><a href="https://gist.github.com/jiang7462582/6d42f8393e6c9676aee7">Gist Code</a></p>
+
